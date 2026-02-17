@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora Arbitraje Premium</title>
+    <meta name="description" content="Calculadora financiera premium para arbitraje Zelle a USDT.">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Outfit for a modern, premium feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+
+<body>
+    <!-- BACKGROUND BLOBS -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container glass-panel">
+        <header>
+            <div class="header-content">
+                <div class="logo-area">
+                    <div class="logo-icon">$</div>
+                    <h1>Arbitraje<span class="highlight">Pro</span></h1>
+                </div>
+                <p class="subtitle">Calculadora Financiera Inteligente</p>
+            </div>
+        </header>
+
+        <main>
+            <form id="calcForm">
+                <div class="input-group">
+                    <label for="zelleAmount">Monto Zelle ($)</label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="zelleAmount" placeholder="0.00" step="0.01" inputmode="decimal">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-group half">
+                        <label for="usdtReceived">USDT Recibidos</label>
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">₮</span>
+                            <input type="number" id="usdtReceived" placeholder="0.00" step="0.01" inputmode="decimal">
+                        </div>
+                    </div>
+
+                    <div class="input-group half">
+                        <label for="usdtSellRate">Venta (Bs/USDT)</label>
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">Bs</span>
+                            <input type="number" id="usdtSellRate" placeholder="0.00" step="0.01" inputmode="decimal">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group highlight-group">
+                    <div class="label-row">
+                        <label for="cashBuyRate">Compra Efectivo (Bs/$)</label>
+                        <button type="button" id="useBcvBtn" class="pill-btn">
+                            <span class="icon">🏦</span> BCV: <span id="bcvRateDisplay">--</span>
+                        </button>
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">Bs</span>
+                        <input type="number" id="cashBuyRate" placeholder="0.00" step="0.01" inputmode="decimal">
+                    </div>
+                </div>
+            </form>
+
+            <div id="results" class="results-container hidden">
+                <!-- MAIN METRIC -->
+                <div class="result-card glowing-card">
+                    <span class="label">Capital Resultante</span>
+                    <span class="value main-value" id="totalBs">0.00 <small>Bs</small></span>
+                </div>
+
+                <!-- BREAKEVEN -->
+                <div class="result-card info-card">
+                    <div class="info-row">
+                        <span class="label">Tasa de Equilibrio</span>
+                        <span class="value" id="breakevenRate">0.00 <small>Bs/$</small></span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: 75%"></div>
+                    </div>
+                    <p class="desc">Máximo precio de compra para no perder dinero.</p>
+                </div>
+
+                <!-- PROFIT SECTION -->
+                <div class="result-card profit-card">
+                    <div class="profit-header">
+                        <span class="label">Profit / Ganancia Neta</span>
+                        <span class="badge" id="profitBadge">CALCULANDO</span>
+                    </div>
+                    <div class="profit-grid">
+                        <div class="profit-item">
+                            <span class="sub-label">En Dólares</span>
+                            <span class="profit-val dollar" id="profitUsd">0.00 $</span>
+                        </div>
+                        <div class="profit-separator"></div>
+                        <div class="profit-item">
+                            <span class="sub-label">En Bolívares</span>
+                            <span class="profit-val bolivar" id="profitBs">0.00 Bs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-text glass-popped" id="summaryText">
+                    <!-- Text generated by JS -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="resetBtn" class="reset-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                Nueva Operación
+            </button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
