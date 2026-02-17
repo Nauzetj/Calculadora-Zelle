@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arbicalc-v1';
+const CACHE_NAME = 'arbicalc-v2';
 const urlsToCache = [
     './index.html',
     './style.css',
