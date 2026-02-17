@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // Predefined Rates (Simulation for BCV - In a real app this could fetch from an API)
-const MOCK_BCV_DATE = "Actual"; 
+const MOCK_BCV_DATE = "Actual";
 let currentBcvRate = 396.37; // Default initial value
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,35 +17,32 @@ document.addEventListener('DOMContentLoaded', () => {
         zelle: document.getElementById('zelleAmount'),
         usdtReceived: document.getElementById('usdtReceived'),
         usdtSellRate: document.getElementById('usdtSellRate'),
-        cashBuyRate: document.getElementById('cashBuyRate')
+        cashBuyRate: document.getElementById('cashBuyRate'),
+        usdtSellRate: document.getElementById('usdtSellRate')
     };
 
     // Displays
     const displays = {
         totalBs: document.getElementById('totalBs'),
         breakevenRate: document.getElementById('breakevenRate'),
-        profitBs: document.getElementById('profitBs'),
-        profitUsd: document.getElementById('profitUsd'),
-        buyRateDisplay: document.getElementById('buyRateDisplay'),
-        summaryText: document.getElementById('summaryText'),
-        resultsContainer: document.getElementById('results'),
-        bcvRateDisplay: document.getElementById('bcvRateDisplay')
+        finalCash: document.getElementById('finalCash'),
+        resultsContainer: document.getElementById('results')
     };
 
-    const useBcvBtn = document.getElementById('useBcvBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const cashBuyRateInput = document.getElementById('cashBuyRate'); // This is the hidden input for the cash buy rate
 
-    // Init BCV display
-    displays.bcvRateDisplay.textContent = `${currentBcvRate} Bs`;
-
-    // Calculate Logic
-    function calculate() {
-        const val = {
+    // Init Logic
+    function getVals() {
+        return {
             zelle: parseFloat(inputs.zelle.value) || 0,
             usdtReceived: parseFloat(inputs.usdtReceived.value) || 0,
-            usdtSellRate: parseFloat(inputs.usdtSellRate.value) || 0,
-            cashBuyRate: parseFloat(inputs.cashBuyRate.value) || 0
+            usdtSellRate: parseFloat(inputs.usdtSellRate.value) || 0
         };
+    }
+
+    function calculate() {
+        const val = getVals();
 
         if (val.zelle > 0 && val.usdtReceived > 0 && val.usdtSellRate > 0) {
             // Unhide results
@@ -54,58 +51,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Total Bs
             const totalBs = val.usdtReceived * val.usdtSellRate;
-            displays.totalBs.textContent = formatNb(totalBs) + ' Bs';
+            displays.totalBs.textContent = formatNb(totalBs);
 
-            // 2. Tasa de Equilibrio (Breakeven)
+            // 2. Tasa de Equilibrio (Auto-Calculated)
             const breakeven = totalBs / val.zelle;
-            displays.breakevenRate.textContent = formatNb(breakeven) + ' Bs/$';
+            displays.breakevenRate.textContent = formatNb(breakeven);
 
-            // 3. Profit/Loss Analysis (Only if Cash Buy Rate is provided)
-            if (val.cashBuyRate > 0) {
-                displays.buyRateDisplay.textContent = formatNb(val.cashBuyRate);
-                
-                // Cost to buy back the Zelle amount in Cash
-                const costBs = val.zelle * val.cashBuyRate;
-                
-                // Profit in Bs
-                const profitBs = totalBs - costBs;
-                
-                // Profit in USD (Profit Bs / Cash Buy Rate) OR (Total USD gained - Initial Zelle)
-                // Let's use: How much USD do I have now? Total Bs / Cash Rate
-                const finalUsd = totalBs / val.cashBuyRate;
-                const profitUsd = finalUsd - val.zelle;
+            // 3. Auto-Apply Breakeven Rate to Logic (Simulated)
+            // User requested to "use the recommended rate to calculate cash received".
+            // If we buy at Breakeven, Cash = Zelle.
+            // If we buy at BCV? No, user said "use recommended".
+            // Let's show the Cash value assuming they buy at BREAKEVEV (which is the max).
+            // Actually, if they buy at Breakeven, they get exactly their Zelle back.
+            // Let's display simple Zelle amount as "Retorno" or allow input?
+            // "Utiliza la tasa que me recomienda" -> Use Breakeven.
 
-                // Color coding
-                const profitCard = document.querySelector('.result-card.profit');
-                if (profitBs >= 0) {
-                    displays.profitBs.textContent = '+' + formatNb(profitBs) + ' Bs';
-                    displays.profitUsd.textContent = '+' + formatNb(profitUsd) + ' $';
-                    profitCard.classList.remove('negative');
-                    profitCard.classList.add('positive');
-                } else {
-                    displays.profitBs.textContent = formatNb(profitBs) + ' Bs';
-                    displays.profitUsd.textContent = formatNb(profitUsd) + ' $';
-                    profitCard.classList.remove('positive');
-                    profitCard.classList.add('negative');
-                }
+            // Set hidden input value for reference
+            cashBuyRateInput.value = breakeven.toFixed(2);
 
-                // Summary Text
-                displays.summaryText.innerHTML = `
-                    Para recuperar tus <strong>${val.zelle}$</strong> iniciales, teniendo <strong>${formatNb(totalBs)} Bs</strong>, debes comprar el efectivo a un máximo de <strong>${formatNb(breakeven)} Bs/USD</strong>.<br><br>
-                    Si pagas el efectivo a <strong>${formatNb(val.cashBuyRate)} Bs</strong>, tu ganancia neta sería de <strong>${formatNb(profitUsd)} $</strong>.
-                `;
-
-            } else {
-                displays.buyRateDisplay.textContent = '--';
-                displays.profitBs.textContent = '0.00 Bs';
-                displays.profitUsd.textContent = '0.00 $';
-                displays.summaryText.innerHTML = `Ingresa una "Tasa Compra Efectivo" para ver tu ganancia.`;
-            }
+            // Final Cash (Technically = Zelle Amount if Rate = Breakeven)
+            // But let's calculate it properly in case of rounding
+            const finalUsd = totalBs / breakeven;
+            displays.finalCash.textContent = formatNb(finalUsd) + ' $';
 
         } else {
-            // Hide or clear if incomplete
+            // Hide
             displays.resultsContainer.classList.remove('visible');
-            // displays.resultsContainer.classList.add('hidden'); // Optional: keep hidden until valid
+            displays.resultsContainer.classList.add('hidden');
         }
     }
 
@@ -117,11 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     Object.values(inputs).forEach(input => {
         input.addEventListener('input', calculate);
-    });
-
-    useBcvBtn.addEventListener('click', () => {
-        inputs.cashBuyRate.value = currentBcvRate;
-        calculate();
     });
 
     resetBtn.addEventListener('click', () => {
